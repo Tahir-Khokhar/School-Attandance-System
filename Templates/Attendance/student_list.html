@@ -1,0 +1,80 @@
+{% extends "attendance/base.html" %}
+{% block title %}Students - School Attendance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Students</h1>
+    <a href="{% url 'student_add' %}" class="btn btn-primary">+ Add Student</a>
+</div>
+
+<!-- Filter Bar -->
+<form class="filter-bar" method="get">
+    <div class="form-group">
+        <label>Search</label>
+        <input type="text" name="q" value="{{ query }}" class="form-input" placeholder="Name, ID, or Roll No.">
+    </div>
+    <div class="form-group">
+        <label>Class</label>
+        <select name="student_class" class="form-input">
+            <option value="">All Classes</option>
+            {% for val, label in class_choices %}
+            <option value="{{ val }}" {% if class_filter == val %}selected{% endif %}>Class {{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Section</label>
+        <select name="section" class="form-input">
+            <option value="">All Sections</option>
+            {% for val, label in section_choices %}
+            <option value="{{ val }}" {% if section_filter == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
+<!-- Students Table -->
+<div class="card">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Roll No.</th>
+                    <th>Class</th>
+                    <th>Section</th>
+                    <th>Contact</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.student_id }}</td>
+                    <td><a href="{% url 'student_detail' student.pk %}">{{ student.full_name }}</a></td>
+                    <td>{{ student.roll_number }}</td>
+                    <td>{{ student.student_class }}</td>
+                    <td>{{ student.section }}</td>
+                    <td>{{ student.parent_contact }}</td>
+                    <td class="actions">
+                        <a href="{% url 'student_edit' student.pk %}" class="btn btn-outline btn-sm">Edit</a>
+                        <a href="{% url 'student_delete' student.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <div class="empty-icon">&#9824;</div>
+                            <p>No students found. <a href="{% url 'student_add' %}">Add your first student</a>.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
