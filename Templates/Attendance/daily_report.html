@@ -1,0 +1,88 @@
+{% extends "attendance/base.html" %}
+{% block title %}Daily Report - School Attendance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Daily Report</h1>
+</div>
+
+<!-- Date Selector -->
+<form class="filter-bar" method="get">
+    <div class="form-group">
+        <label>Date</label>
+        <input type="date" name="date" value="{{ selected_date }}" class="form-input">
+    </div>
+    <button type="submit" class="btn btn-primary">View Report</button>
+</form>
+
+<!-- Summary -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">&#9783;</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ total }}</div>
+            <div class="stat-label">Total Marked</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">&#10003;</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ summary.present }}</div>
+            <div class="stat-label">Present</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon red">&#10007;</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ summary.absent }}</div>
+            <div class="stat-label">Absent</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon yellow">&#9201;</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ summary.late }}</div>
+            <div class="stat-label">Late</div>
+        </div>
+    </div>
+</div>
+
+<!-- Records Table -->
+<div class="card">
+    <div class="card-header">Attendance Records for {{ report_date|date:"M d, Y" }}</div>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Status</th>
+                    <th>Marked By</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.student.student_id }}</td>
+                    <td>{{ record.student.full_name }}</td>
+                    <td>{{ record.student.student_class }}-{{ record.student.section }}</td>
+                    <td><span class="badge badge-{{ record.status }}">{{ record.get_status_display }}</span></td>
+                    <td>{{ record.marked_by.username|default:"N/A" }}</td>
+                    <td>{{ record.marked_at|date:"h:i A" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <p>No attendance records for this date.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
