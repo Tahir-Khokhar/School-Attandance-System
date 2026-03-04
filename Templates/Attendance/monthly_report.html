@@ -1,0 +1,94 @@
+{% extends "attendance/base.html" %}
+{% block title %}Monthly Report - School Attendance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Monthly Report</h1>
+</div>
+
+<!-- Filters -->
+<form class="filter-bar" method="get">
+    <div class="form-group">
+        <label>Month</label>
+        <select name="month" class="form-input">
+            {% for val, label in months %}
+            <option value="{{ val }}" {% if selected_month == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Year</label>
+        <select name="year" class="form-input">
+            {% for y in years %}
+            <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Class</label>
+        <select name="student_class" class="form-input">
+            <option value="">All Classes</option>
+            {% for val, label in class_choices %}
+            <option value="{{ val }}" {% if selected_class == val %}selected{% endif %}>Class {{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Section</label>
+        <select name="section" class="form-input">
+            <option value="">All Sections</option>
+            {% for val, label in section_choices %}
+            <option value="{{ val }}" {% if selected_section == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">View Report</button>
+</form>
+
+<!-- Report Table -->
+<div class="card">
+    <div class="card-header">Monthly Attendance Summary</div>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Total Days</th>
+                    <th>Present</th>
+                    <th>Absent</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in report_data %}
+                <tr>
+                    <td>{{ item.student.student_id }}</td>
+                    <td><a href="{% url 'student_detail' item.student.pk %}">{{ item.student.full_name }}</a></td>
+                    <td>{{ item.student.student_class }}-{{ item.student.section }}</td>
+                    <td>{{ item.total_days }}</td>
+                    <td>{{ item.present }}</td>
+                    <td>{{ item.absent }}</td>
+                    <td>
+                        <div class="pct-bar">
+                            <div class="pct-bar-fill {% if item.percentage >= 75 %}high{% elif item.percentage >= 50 %}medium{% else %}low{% endif %}"
+                                 style="width:{{ item.percentage }}%"></div>
+                        </div>
+                        {{ item.percentage }}%
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <p>No attendance data found for the selected criteria.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
