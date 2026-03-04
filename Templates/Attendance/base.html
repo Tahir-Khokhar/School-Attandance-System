@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}School Attendance{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+{% block body %}
+<div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Attendance</h2>
+            <small>School Management</small>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">Main</div>
+            <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <span class="nav-icon">&#9632;</span> Dashboard
+            </a>
+
+            <div class="sidebar-section">Students</div>
+            <a href="{% url 'student_list' %}" class="{% if 'student' in request.resolver_match.url_name %}active{% endif %}">
+                <span class="nav-icon">&#9824;</span> All Students
+            </a>
+            <a href="{% url 'student_add' %}">
+                <span class="nav-icon">+</span> Add Student
+            </a>
+
+            <div class="sidebar-section">Attendance</div>
+            <a href="{% url 'mark_attendance' %}" class="{% if request.resolver_match.url_name == 'mark_attendance' %}active{% endif %}">
+                <span class="nav-icon">&#10003;</span> Mark Attendance
+            </a>
+
+            <div class="sidebar-section">Reports</div>
+            <a href="{% url 'daily_report' %}" class="{% if request.resolver_match.url_name == 'daily_report' %}active{% endif %}">
+                <span class="nav-icon">&#9783;</span> Daily Report
+            </a>
+            <a href="{% url 'monthly_report' %}" class="{% if request.resolver_match.url_name == 'monthly_report' %}active{% endif %}">
+                <span class="nav-icon">&#9783;</span> Monthly Report
+            </a>
+
+            {% if user.is_superuser or user.profile.role == 'admin' %}
+            <div class="sidebar-section">Admin</div>
+            <a href="{% url 'register_teacher' %}">
+                <span class="nav-icon">+</span> Register Teacher
+            </a>
+            {% endif %}
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">Logged in as: <strong>{{ user.username }}</strong></div>
+            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}
+</body>
+</html>
