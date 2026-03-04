@@ -1,0 +1,91 @@
+{% extends "attendance/base.html" %}
+{% block title %}{{ student.full_name }} - School Attendance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ student.full_name }}</h1>
+    <div class="actions">
+        <a href="{% url 'student_edit' student.pk %}" class="btn btn-outline btn-sm">Edit</a>
+        <a href="{% url 'student_list' %}" class="btn btn-outline btn-sm">Back to List</a>
+    </div>
+</div>
+
+<!-- Student Info -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="stat-label">Student ID</div>
+            <div class="stat-value" style="font-size:18px;">{{ student.student_id }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="stat-label">Roll Number</div>
+            <div class="stat-value" style="font-size:18px;">{{ student.roll_number }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="stat-label">Class</div>
+            <div class="stat-value" style="font-size:18px;">{{ student.student_class }}-{{ student.section }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="stat-label">Parent Contact</div>
+            <div class="stat-value" style="font-size:18px;">{{ student.parent_contact }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance Summary -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon green">%</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ monthly_pct }}%</div>
+            <div class="stat-label">This Month</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon blue">%</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ overall_pct }}%</div>
+            <div class="stat-label">Overall</div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Records -->
+<div class="card">
+    <div class="card-header">Recent Attendance Records</div>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Marked By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.date|date:"M d, Y" }}</td>
+                    <td><span class="badge badge-{{ record.status }}">{{ record.get_status_display }}</span></td>
+                    <td>{{ record.marked_by.username|default:"N/A" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">
+                        <div class="empty-state">
+                            <p>No attendance records yet.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
