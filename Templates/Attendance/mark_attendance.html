@@ -1,0 +1,106 @@
+{% extends "attendance/base.html" %}
+{% load attendance_tags %}
+{% block title %}Mark Attendance - School Attendance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Mark Attendance</h1>
+</div>
+
+<!-- Class/Section Selector -->
+<form class="filter-bar" method="get">
+    <div class="form-group">
+        <label>Class</label>
+        <select name="student_class" class="form-input" required>
+            <option value="">Select Class</option>
+            {% for val, label in class_choices %}
+            <option value="{{ val }}" {% if selected_class == val %}selected{% endif %}>Class {{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Section</label>
+        <select name="section" class="form-input" required>
+            <option value="">Select Section</option>
+            {% for val, label in section_choices %}
+            <option value="{{ val }}" {% if selected_section == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Date</label>
+        <input type="date" name="date" value="{{ selected_date }}" class="form-input">
+    </div>
+    <button type="submit" class="btn btn-primary">Load Students</button>
+</form>
+
+{% if students %}
+<div class="card">
+    <div class="card-header">
+        Class {{ selected_class }}-{{ selected_section }} | {{ selected_date }}
+        <span style="float:right; font-size:13px; color:var(--gray-500);">{{ students|length }} student(s)</span>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Quick Mark All Buttons -->
+        <div style="margin-bottom:16px; display:flex; gap:8px;">
+            <button type="button" class="btn btn-sm btn-success" onclick="markAll('present')">All Present</button>
+            <button type="button" class="btn btn-sm btn-danger" onclick="markAll('absent')">All Absent</button>
+        </div>
+
+        {% for student in students %}
+        <div class="attendance-row">
+            <div class="attendance-student">
+                <strong>{{ student.roll_number }}.</strong> {{ student.full_name }}
+                <br><small>ID: {{ student.student_id }}</small>
+            </div>
+            <div class="attendance-options">
+                <label>
+                    <input type="radio" name="status_{{ student.id }}" value="present"
+                        {% if existing|get_item:student.id == "present" %}checked{% endif %}
+                        class="status-radio" data-student="{{ student.id }}">
+                    <span class="opt-present">Present</span>
+                </label>
+                <label>
+                    <input type="radio" name="status_{{ student.id }}" value="absent"
+                        {% if existing|get_item:student.id == "absent" %}checked{% endif %}
+                        class="status-radio" data-student="{{ student.id }}">
+                    <span class="opt-absent">Absent</span>
+                </label>
+                <label>
+                    <input type="radio" name="status_{{ student.id }}" value="late"
+                        {% if existing|get_item:student.id == "late" %}checked{% endif %}
+                        class="status-radio" data-student="{{ student.id }}">
+                    <span class="opt-late">Late</span>
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div style="margin-top:20px;">
+            <button type="submit" class="btn btn-primary">Save Attendance</button>
+        </div>
+    </form>
+</div>
+
+<script>
+function markAll(status) {
+    document.querySelectorAll('.status-radio').forEach(function(radio) {
+        if (radio.value === status) {
+            radio.checked = true;
+        }
+    });
+}
+</script>
+
+{% elif selected_class and selected_section %}
+<div class="card">
+    <div class="empty-state">
+        <div class="empty-icon">&#9824;</div>
+        <p>No students found in Class {{ selected_class }}-{{ selected_section }}.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
