@@ -1,0 +1,23 @@
+{% extends "attendance/base.html" %}
+{% block title %}Delete Student - School Attendance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Delete Student</h1>
+</div>
+
+<div class="card">
+    <p style="margin-bottom:20px; font-size:15px;">
+        Are you sure you want to delete <strong>{{ student.full_name }}</strong>
+        (ID: {{ student.student_id }}, Class {{ student.student_class }}-{{ student.section }})?
+        This will also delete all attendance records for this student.
+    </p>
+    <form method="post">
+        {% csrf_token %}
+        <div style="display:flex; gap:12px;">
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <a href="{% url 'student_list' %}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
