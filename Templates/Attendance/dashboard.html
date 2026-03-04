@@ -1,0 +1,89 @@
+{% extends "attendance/base.html" %}
+{% block title %}Dashboard - School Attendance{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Dashboard</h1>
+    <span style="color:var(--gray-500);">{{ today|date:"l, F j, Y" }}</span>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">&#9824;</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ total_students }}</div>
+            <div class="stat-label">Total Students</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">&#10003;</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ present_today }}</div>
+            <div class="stat-label">Present Today</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon red">&#10007;</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ absent_today }}</div>
+            <div class="stat-label">Absent Today</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon yellow">&#9201;</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ late_today }}</div>
+            <div class="stat-label">Late Today</div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+    <div class="card-header">Quick Actions</div>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="{% url 'mark_attendance' %}" class="btn btn-primary">Mark Attendance</a>
+        <a href="{% url 'student_add' %}" class="btn btn-success">Add Student</a>
+        <a href="{% url 'daily_report' %}" class="btn btn-outline">Daily Report</a>
+        <a href="{% url 'monthly_report' %}" class="btn btn-outline">Monthly Report</a>
+    </div>
+</div>
+
+<!-- Low Attendance Alert -->
+{% if low_attendance %}
+<div class="card">
+    <div class="card-header">Low Attendance Alert (Below 75% this month)</div>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Class</th>
+                    <th>Attendance %</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in low_attendance %}
+                <tr>
+                    <td><a href="{% url 'student_detail' item.student.pk %}">{{ item.student.full_name }}</a></td>
+                    <td>{{ item.student.student_class }}-{{ item.student.section }}</td>
+                    <td>
+                        <div class="pct-bar"><div class="pct-bar-fill low" style="width:{{ item.percentage }}%"></div></div>
+                        {{ item.percentage }}%
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% if unmarked_today > 0 %}
+<div class="card">
+    <div class="card-header">Unmarked Students</div>
+    <p style="color:var(--warning); font-size:14px;">{{ unmarked_today }} student(s) have not been marked for today. <a href="{% url 'mark_attendance' %}">Mark now</a></p>
+</div>
+{% endif %}
+{% endblock %}
